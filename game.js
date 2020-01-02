@@ -32,61 +32,91 @@ function drawPaddle() {
     ctx.strokeStyle = "blue";
     ctx.strokeRect(paddle.x, paddle.y, paddle.width, paddle.height);
 }
+
 // kontrola paletki
 document.addEventListener("keydown", function (event) {
-    if(event.keyCode == 37){
+    if (event.keyCode == 37) {
         leftArrow = true;
-    }else if(event.keyCode == 39){
+    } else if (event.keyCode == 39) {
         rightArrow = true;
     }
 });
 document.addEventListener("keyup", function (event) {
-    if(event.keyCode == 37){
+    if (event.keyCode == 37) {
         leftArrow = false;
-    }else if(event.keyCode == 39){
+    } else if (event.keyCode == 39) {
         rightArrow = false;
     }
 });
+
 // ruch paletki
 function movePaddle() {
-    if(rightArrow && paddle.x + paddle.width){
+    if (rightArrow && paddle.x + paddle.width) {
         paddle.x += paddle.dx;
-    }else if(leftArrow && paddle.x > 0){
+    } else if (leftArrow && paddle.x > 0) {
         paddle.x -= paddle.dx;
     }
 }
+
 // tworzenie piłeczki
 const ball = {
-x : cvs.width/2,
-    y : paddle.y - ball_radius,
-    radius : ball_radius,
-    dx : 3,
-    dy : -3
+    x: cvs.width / 2,
+    y: paddle.y - ball_radius,
+    radius: ball_radius,
+    dx: 3,
+    dy: -3
 };
+
 // ryspwanie piłeczki
 function drawBall() {
     ctx.beginPath();
 
-    ctx.arc(ball.x, ball.y, ball, radius, 0, Math.PI*2);
-    ctx.fillStyle = ""
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+    ctx.fillStyle = "black";
+    ctx.fill();
+
+    ctx.strokeStyle = "yellow";
+    ctx.stroke();
+
+    ctx.closePath();
+}
+
+// ruch piłeczki
+function moveBall() {
+    ball.x += ball.dx;
+    ball.y += ball.dy;
+}
+
+// detekcja kolizji piłeczki oraz ściany
+function ballWallCollision() {
+    if (ball.x + ball.radius > cvs.width || ball.x - ball.radius < 0) {
+        ball.dx = -ball.dx;
+    }
+
+    if (ball.y - ball.radius < 0) {
+        ball.dy = -ball.dy;
+    }
 }
 
 // funkcja rysowania
 function draw() {
     drawPaddle();
+    drawBall();
 }
 
 // funkcja aktualizacji gry/ update
 function update() {
-movePaddle()
+    movePaddle();
+    moveBall();
+    ballWallCollision()
 }
 
 // pętla gry/loop
 function loop() {
-    ctx.drawImage(bg_img,0,0 );
+    ctx.drawImage(bg_img, 0, 0);
     draw();
     update();
     requestAnimationFrame(loop);
 }
 
-loop()
+loop();
