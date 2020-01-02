@@ -12,6 +12,7 @@ const paddle_width = 100;
 const paddle_margin_bottom = 50;
 const paddle_height = 20;
 const ball_radius = 8;
+let LIFE = 3; //gracz posiada 3 życia/możliwości nie odbicia piłeczki
 let leftArrow = false;
 let rightArrow = false;
 
@@ -51,7 +52,7 @@ document.addEventListener("keyup", function (event) {
 
 // ruch paletki
 function movePaddle() {
-    if (rightArrow && paddle.x + paddle.width) {
+    if (rightArrow && paddle.x + paddle.width < cvs.width) {
         paddle.x += paddle.dx;
     } else if (leftArrow && paddle.x > 0) {
         paddle.x -= paddle.dx;
@@ -63,7 +64,8 @@ const ball = {
     x: cvs.width / 2,
     y: paddle.y - ball_radius,
     radius: ball_radius,
-    dx: 3,
+    speed : 4,
+    dx: 3 * (Math.random() * 2-1),
     dy: -3
 };
 
@@ -92,9 +94,39 @@ function ballWallCollision() {
     if (ball.x + ball.radius > cvs.width || ball.x - ball.radius < 0) {
         ball.dx = -ball.dx;
     }
-
     if (ball.y - ball.radius < 0) {
         ball.dy = -ball.dy;
+    }
+    if(ball.y + ball.radius > cvs.height){
+        LIFE -- ; //utrata życia
+        resetBall();
+    }
+}
+// funkcja restartu piłeczki
+function resetBall() {
+    ball.x = cvs.width/2;
+    ball.y = paddle.y - ball.radius;
+    ball.dx = 3 * (Math.random() * 2-1);
+    ball.dy = -3
+}
+// funkcja kolizji piłeczki i paletki
+function ballPaddleCollision() {
+    if(ball.x < paddle.x + paddle.width
+        && ball.x > paddle.x
+        && paddle.y < paddle.y + paddle.height
+        && ball.y > paddle.y){
+
+        // sprawdz gdzie piłeczka uderzy paletke
+        let collidePoint = ball.x - (paddle.x + paddle.width/2);
+
+        //normalizacja wartości
+        collidePoint = collidePoint / (paddle.width/2);
+
+        // przeliczenie kąta piłeczki
+        let angle = collidePoint * Math.PI/3;
+
+        ball.dx = ball.speed * Math.sin(angle);
+        ball.dy = - ball.speed * Math.cos(angle);
     }
 }
 
@@ -109,6 +141,7 @@ function update() {
     movePaddle();
     moveBall();
     ballWallCollision()
+    ballPaddleCollision()
 }
 
 // pętla gry/loop
