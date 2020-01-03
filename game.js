@@ -238,6 +238,7 @@ function draw() {
 // koniec gry
 function gameOver() {
     if (LIFE <= 0) {
+        showYouLose();
         game_over = true;
     }
 }
@@ -256,6 +257,7 @@ function levelUp() {
     if (isLevelDone) {
         win.play();
         if (level >= max_level) {
+            showYouWin();
             game_over = true;
             return;
         }
@@ -299,7 +301,7 @@ soundElement.addEventListener("click", audioManager);
 function audioManager() {
 // zmień img dzwięku z ON na OFF
     let imgSrc = soundElement.getAttribute("src");
-    let SOUND_ON = imgSrc == "img/SOUND_ON.png" ? "img/SOUND_OFF.png" : "img/SOUND_ON.png";
+    let SOUND_IMG = imgSrc == "img/SOUND_ON.png" ? "img/SOUND_OFF.png" : "img/SOUND_ON.png";
 
     soundElement.setAttribute("src", SOUND_IMG); //??
 
@@ -309,4 +311,27 @@ function audioManager() {
     brick_hit.muted = brick_hit.muted ? false : true;
     win.muted = win.muted ? false : true;
     life_lost.muted = life_lost.muted ? false : true;
+}
+
+// pokaż informację o końcu gry
+const gameover = document.getElementById("gameover");
+const youwon = document.getElementById("youwon");
+const youlose = document.getElementById("youlose");
+const restart = document.getElementById("restart");
+
+// kliknij guzik graj ponownie
+restart.addEventListener("click", function () {
+    location.reload(); //przeładuj scenę
+});
+
+// pokaż zwycięstwo
+function showYouWin() {
+    gameover.style.display = "block";
+    youwon.style.display = "block";
+}
+
+// przegrałeś
+function showYouLose() {
+    gameover.style.display = "block";
+    youlose.style.display = "block";
 }
