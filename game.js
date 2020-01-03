@@ -98,12 +98,15 @@ function moveBall() {
 function ballWallCollision() {
     if (ball.x + ball.radius > cvs.width || ball.x - ball.radius < 0) {
         ball.dx = -ball.dx;
+        wall_hit.play();
     }
     if (ball.y - ball.radius < 0) {
         ball.dy = -ball.dy;
+        wall_hit.play();
     }
     if(ball.y + ball.radius > cvs.height){
         LIFE -- ; //utrata życia
+        life_lost.play()
         resetBall();
     }
 }
@@ -121,6 +124,9 @@ function ballPaddleCollision() {
         && paddle.y < paddle.y + paddle.height
         && ball.y > paddle.y){
 
+        // dzwiek
+        paddle_hit.play();
+
         // sprawdz gdzie piłeczka uderzy paletke
         let collidePoint = ball.x - (paddle.x + paddle.width/2);
 
@@ -136,7 +142,7 @@ function ballPaddleCollision() {
 }
 // tworzenie klocków
 const brick = {
-    row : 3,
+    row : 1,
     column : 5,
     width : 55,
     height : 20,
@@ -189,6 +195,7 @@ function ballBrickCollision() {
             if (b.status) {
                 if (ball.x + ball.radius > b.x && ball.x - ball.radius < b.x + brick.width &&
                 ball.y + ball.radius > b.y && ball.y - ball.radius < b.y + brick.height){
+                    brick_hit.play();
                     ball.dy = -ball.dy;
                     b.status = false; //gdy klocek zostanie uszkodzony
                     score += score_unit;
@@ -230,7 +237,30 @@ function gameOver() {
         game_over = true;
     }
 }
+// poziom wyżej
+function levelUp() {
+    let isLevelDone = true;
 
+    // sprawdz czy wszystkie klocki są zbite/uszkodzone
+    for (let r = 0; r < brick.row; r++) {
+        for (let c = 0; c < brick.column; c++) {
+           isLevelDone = isLevelDone && ! bricks[r][c].status;
+        }
+    }
+
+    if(isLevelDone){
+        if(level >= max_level){
+            win.play();
+            game_over = true;
+            return;
+        }
+        brick.row++;
+        createBricks();
+        ball.speed += 0.5;
+        resetBall();
+        level++;
+    }
+}
 
 // funkcja aktualizacji gry/ update
 function update() {
@@ -240,6 +270,7 @@ function update() {
     ballPaddleCollision();
     ballBrickCollision();
     gameOver();
+    levelUp();
 }
 
 // pętla gry/loop
