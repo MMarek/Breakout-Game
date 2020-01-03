@@ -13,6 +13,10 @@ const paddle_margin_bottom = 50;
 const paddle_height = 20;
 const ball_radius = 8;
 let LIFE = 3; //gracz posiada 3 życia/możliwości nie odbicia piłeczki
+let score = 0;
+const score_unit = 10;
+let level = 1;
+const max_level = 3;
 let leftArrow = false;
 let rightArrow = false;
 
@@ -129,24 +133,111 @@ function ballPaddleCollision() {
         ball.dy = - ball.speed * Math.cos(angle);
     }
 }
+// tworzenie klocków
+const brick = {
+    row : 3,
+    column : 5,
+    width : 55,
+    height : 20,
+    offsetLeft : 20,
+    offsetTop : 20,
+    marginTop : 40,
+    fillColor : "black",
+    strokeColor : "#FFF"
+};
+
+let bricks = [];
+function createBricks() {
+    for (let r = 0; r < brick.row; r++) {
+        bricks[r] = [];
+        for (let c = 0; c < brick.column; c++) {
+            bricks[r][c] = {
+                x : c * (brick.offsetLeft + brick.width) + brick.offsetLeft,
+                y : r * (brick.offsetTop + brick.height) + brick.offsetTop + brick.marginTop,
+                status : true
+            }
+        }
+    }
+}
+
+createBricks();
+
+// rysuj klocki
+function drawBricks() {
+    for (let r = 0; r < brick.row; r++) {
+        for (let c = 0; c < brick.column; c++) {
+            let b = bricks[r][c];
+                // jezeli klocek nie jest uszkodzony
+                if(b.status){
+                ctx.fillStyle = brick.fillColor;
+                ctx.fillRect(b.x, b.y, brick.width, brick.height);
+
+                ctx.strokeStyle = brick.strokeColor;
+                ctx.strokeRect(b.x, b.y, brick.width, brick.height);
+            }
+        }
+    }
+}
+
+// kolizja relacji piłka-klocek
+function ballBrickCollision() {
+    for (let r = 0; r < brick.row; r++) {
+        for (let c = 0; c < brick.column; c++) {
+            let b = bricks[r][c];
+            // jezeli klocek nie jest uszkodzony
+            if (b.status) {
+                if (ball.x + ball.radius > b.x && ball.x - ball.radius < b.x + brick.width &&
+                ball.y + ball.radius > b.y && ball.y - ball.radius < b.y + brick.height){
+                    ball.dy = -ball.dy;
+                    b.status = false; //gdy klocek zostanie uszkodzony
+                    score += score_unit;
+                }
+            }
+        }
+    }
+}
+
+// pokaż statystyki gry
+function showGameStats(text, textX, textY, img, imgX, imgY) {
+    // rysuj text
+    ctx.fillStyle = "#FFF";
+    ctx.font = "25px Germanin One";
+    ctx.fillText(text, textX, textY);
+
+    // rysuj img
+    ctx.drawImage(img, imgX, imgY, width = 25, height = 25);
+
+}
 
 // funkcja rysowania
 function draw() {
     drawPaddle();
     drawBall();
+    drawBricks();
+
+    // pokaż punktacje
+    showGameStats(score, 35, 25, score_img, 5, 5);
+    // pokaż życia
+    showGameStats(LIFE, cvs.width - 25, 25, life_img, cvs.width-55, 5);
+    // pokaż poziom
+    showGameStats(level, cvs.width/2, 25, level_img, cvs.width/2-30, 5);
 }
 
 // funkcja aktualizacji gry/ update
 function update() {
     movePaddle();
     moveBall();
-    ballWallCollision()
-    ballPaddleCollision()
+    ballWallCollision();
+    ballPaddleCollision();
+    ballBrickCollision()
 }
 
 // pętla gry/loop
 function loop() {
     ctx.drawImage(bg_img, 0, 0);
+    // ctx.drawImage(score_img, 0, 0);
+    // ctx.drawImage(life_img, 0, 0);
+    // ctx.drawImage(level_img, 0, 0);
     draw();
     update();
     requestAnimationFrame(loop);
