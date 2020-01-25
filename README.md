@@ -1,9 +1,7 @@
 # Breakout-Game
 Breakout all blocks - game.
 
-Breakout all blocks - game.
-
-Used:
+# Used:
 Css, JS
 
-https://mmarek.github.io/Breakout-Game/ - LIVE PREVIEW
+# https://mmarek.github.io/Breakout-Game/ - LIVE PREVIEW
