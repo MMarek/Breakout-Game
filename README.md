@@ -9,4 +9,5 @@ https://mmarek.github.io/Breakout-Game/ - LIVE PREVIEW
 
 
 A simple game using basic physics enclosed in geometric space.
-Five levels of old-school entertainment, also with sound. Enjoy :)
+Five levels of old-school entertainment, also with sound. 
+Enjoy :)
